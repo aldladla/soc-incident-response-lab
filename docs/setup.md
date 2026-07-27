@@ -1,13 +1,13 @@
-# Setup
+# Lab Setup
 
-## Host
+## Host System
 
-- Windows 11;
-- 16 GB RAM;
-- Oracle VirtualBox 7.2.6;
-- Hyper-V/VBS wyłączone dla natywnego VT-x.
+- Windows 11
+- 16 GB RAM
+- Oracle VirtualBox 7.2.6
+- Hyper-V and VBS disabled to provide native VT-x access
 
-Bazowe ustawienia VM:
+Baseline virtual machine resources:
 
 | VM | vCPU | RAM |
 | --- | ---: | ---: |
@@ -15,13 +15,14 @@ Bazowe ustawienia VM:
 | Target | 2 | 2048 MB |
 | Kali | 2 | 2048 MB |
 
-Na hoście 16 GB uruchamiam zwykle tylko dwie maszyny naraz. Podczas pełnego
-scenariusza tymczasowo użyłem profilu `7168 + 1536 + 1536 MB` i kontrolowałem
-wolny RAM przed startem kolejnej VM.
+Because the host has 16 GB of RAM, only two virtual machines are normally
+started at the same time. For the complete scenario, a temporary
+`7168 + 1536 + 1536 MB` profile was used while available host memory was
+monitored before each VM was started.
 
-## Sieć
+## Network Isolation
 
-Każda maszyna ma:
+Each virtual machine uses the following VirtualBox configuration:
 
 ```text
 Adapter 1: Internal Network
@@ -29,35 +30,40 @@ Name: soc-lab
 Adapter 2: disabled
 ```
 
-W gościach nie ma bramy ani DNS. `ip route` nie może pokazywać trasy `default`.
+No default gateway or DNS server is configured in the guests. The output of
+`ip route` must not contain a `default` route.
 
-## Target
+## Ubuntu Target
 
-Ubuntu Server 26.04 został zainstalowany z ISO. Konfiguracja:
+Ubuntu Server 26.04 was installed from an ISO image with the following
+configuration:
 
-- `10.77.0.20/24`;
-- OpenSSH Server;
-- `PermitRootLogin no`;
-- UFW wpuszcza TCP/22 tylko z `10.77.0.0/24`;
-- agent Wazuh 4.14.6 wskazuje manager `10.77.0.30`.
+- Static address `10.77.0.20/24`
+- OpenSSH Server enabled
+- Root login disabled with `PermitRootLogin no`
+- UFW permits TCP/22 only from `10.77.0.0/24`
+- Wazuh agent 4.14.6 connected to manager `10.77.0.30`
 
-Netplan znajduje się w
+The Netplan file is available at
 [`guest-config/target/01-netplan.yaml`](../guest-config/target/01-netplan.yaml).
 
-## Wazuh
+## Wazuh Server
 
-Użyłem oficjalnej OVA Wazuh 4.14.6. Appliance otrzymał adres
-`10.77.0.30/24`. Działają usługi manager, indexer, dashboard i filebeat.
+The Wazuh 4.14.6 official OVA was used. The appliance was assigned
+`10.77.0.30/24` and provides the Wazuh manager, indexer, dashboard, and
+Filebeat services.
 
-Konfiguracja sieci:
+Its network configuration is stored in
 [`guest-config/wazuh/20-eth0.network`](../guest-config/wazuh/20-eth0.network).
 
-## Kali
+## Kali Linux
 
-Kali ma adres `10.77.0.10/24` i nie ma trasy domyślnej. Skrypt ćwiczenia:
+Kali uses the static address `10.77.0.10/24` and has no default route. The
+controlled test script is stored at:
 
 ```text
 guest-config/kali/simulate-ssh-failures.sh
 ```
 
-Skrypt wymaga dokładnego źródła i celu, wykonuje 12 prób i kończy pracę.
+The script validates the exact source and destination, generates 12 attempts,
+and exits automatically.

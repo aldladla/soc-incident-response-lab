@@ -1,3 +1,5 @@
+# Purpose: perform read-only host capacity checks before starting the SOC lab.
+# Note: this helper does not install software or change host configuration.
 $ErrorActionPreference = 'Stop'
 
 Add-Type -TypeDefinition @'

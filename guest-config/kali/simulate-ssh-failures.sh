@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# Authorized lab use only. The safeguards below intentionally restrict the
+# source, destination, routing state, and total number of authentication attempts.
 set -euo pipefail
 
 readonly TARGET="10.77.0.20"

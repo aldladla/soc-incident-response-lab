@@ -1,28 +1,31 @@
-# Scenario 01 — SSH authentication failures
+# Scenario 01 — SSH Authentication Failures
 
-Cel: wygenerować 12 kontrolowanych, nieudanych logowań SSH i znaleźć je w Wazuh.
+## Objective
 
-## Warunki
+Generate exactly 12 controlled SSH authentication failures and investigate
+the resulting events in Wazuh.
 
-- Kali: `10.77.0.10/24`;
-- Target: `10.77.0.20/24`;
-- Wazuh: `10.77.0.30/24`;
-- brak trasy domyślnej;
-- aktywny agent `soc-target`;
-- snapshot przed testem.
+## Preconditions
 
-## Uruchomienie
+- Kali: `10.77.0.10/24`
+- Target: `10.77.0.20/24`
+- Wazuh: `10.77.0.30/24`
+- No default route on any guest
+- Wazuh agent `soc-target` is active
+- A baseline snapshot exists before testing
 
-Na Kali:
+## Execution
+
+Run the following command on Kali:
 
 ```bash
 /home/kali/simulate-ssh-failures.sh
 ```
 
-Skrypt ma zabezpieczenia źródła, celu i routingu oraz zawsze kończy się po
-12 próbach.
+The script validates the source address, destination address, and routing
+state. It always stops after 12 attempts.
 
-## Wyszukiwanie w Wazuh
+## Wazuh Queries
 
 ```text
 agent.name: "soc-target" AND rule.id: "5763"
@@ -30,5 +33,7 @@ agent.name: "soc-target" AND rule.id: "5551"
 agent.name: "soc-target" AND rule.id: "5760"
 ```
 
-Po teście należy zablokować konto `soc-test`, zachować dowody i czysto wyłączyć
-maszyny.
+## Cleanup
+
+After the test, lock the `soc-test` account, preserve the evidence, and shut
+down the virtual machines cleanly.

@@ -1,3 +1,5 @@
+# Purpose: apply the documented network and resource profile to existing VMs.
+# Note: all VMs must be powered off. Verify the result in VirtualBox before use.
 $ErrorActionPreference = 'Stop'
 $vbox = 'C:\Program Files\Oracle\VirtualBox\VBoxManage.exe'
 if (-not (Test-Path -LiteralPath $vbox)) {
