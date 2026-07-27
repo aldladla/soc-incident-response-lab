@@ -63,6 +63,7 @@ password-guessing scenario has been executed and documented in this version.
 | Attack vector or use case | Security risk | Detection source | MITRE ATT&CK | Status |
 | --- | --- | --- | --- | --- |
 | Repeated SSH password attempts | Credential guessing against a remote service | `sshd`, PAM, Wazuh correlation | `T1110 — Brute Force` | Completed |
+| Automated containment of SSH brute force | Continued access attempts after detection | Wazuh Active Response and endpoint firewall | Response to `T1110` | Completed |
 | Access with valid SSH credentials | Unauthorized remote access using a compromised account | `sshd`, authentication logs | `T1078 — Valid Accounts`, `T1021.004 — SSH` | Planned |
 | Unauthorized system file changes | Persistence or configuration tampering | Wazuh File Integrity Monitoring | Mapping will be validated during the exercise | Planned |
 | Suspicious shell activity | Post-authentication command execution | Linux audit and endpoint logs | Mapping will be validated during the exercise | Planned |
@@ -114,6 +115,28 @@ event under rule `5763`.
 The detailed analysis and supporting screenshots are available in the
 [incident report](docs/incident-report.md).
 
+## Completed Scenario: Automated SSH Containment
+
+The second scenario extended the SSH detection with a time-limited Wazuh
+Active Response. When rule `5763` detected brute-force activity, the
+`firewall-drop` action blocked `10.77.0.10` on the monitored endpoint for 180
+seconds.
+
+| Stage | Rule | Result |
+| --- | ---: | --- |
+| Detection | `5763` | SSH brute-force activity identified |
+| Containment | `651` | Source host blocked by `firewall-drop` |
+| Recovery | `652` | Source host automatically unblocked |
+
+During containment, ICMP traffic had 100% packet loss and SSH/22 timed out.
+After the timeout, ICMP and SSH connectivity returned without manual firewall
+changes.
+
+![Wazuh automated response lifecycle](docs/images/incident-02/07-full-response-lifecycle.png)
+
+The configuration, validation steps, and response analysis are documented in
+the [Active Response report](docs/incident-response-02.md).
+
 ## Skills Demonstrated
 
 - VirtualBox network segmentation and virtual machine configuration.
@@ -121,6 +144,8 @@ The detailed analysis and supporting screenshots are available in the
 - Host firewall configuration with UFW.
 - Wazuh agent enrollment and endpoint monitoring.
 - SIEM filtering, alert triage, and event correlation.
+- Rule-driven containment with Wazuh Active Response.
+- Verification of temporary firewall enforcement and automatic rollback.
 - Interpretation of SSH and PAM authentication telemetry.
 - MITRE ATT&CK mapping and incident documentation.
 - Evidence collection and validation of investigation findings.
@@ -131,6 +156,7 @@ The detailed analysis and supporting screenshots are available in the
 README.md                      Project overview and results
 docs/setup.md                  Lab configuration overview
 docs/incident-report.md        Analysis of the first detection scenario
+docs/incident-response-02.md   Automated response validation report
 docs/images/                   Selected Wazuh evidence
 guest-config/                  Network configuration used inside the VMs
 scenarios/                     Controlled test procedures
@@ -147,6 +173,8 @@ scripts/                       Host-side helper scripts and usage notes
 6. Take baseline snapshots before generating test activity.
 7. Follow the
    [SSH authentication failure scenario](scenarios/01-ssh-auth-failures/README.md).
+8. Review the additional safety requirements before running the
+   [SSH Active Response scenario](scenarios/02-ssh-active-response/README.md).
 
 The scripts in `scripts/` are documented helper tools. They do not replace the
 manual setup and verification steps.
@@ -170,4 +198,5 @@ against external or unauthorized systems.
 - Repeat the authentication scenario after hardening and compare the alerts.
 - Add a Wazuh File Integrity Monitoring scenario.
 - Add a controlled valid-account detection scenario.
+- Test Active Response allowlisting and false-positive handling.
 - Create a concise incident-response checklist for future investigations.
