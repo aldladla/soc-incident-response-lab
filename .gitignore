@@ -1,0 +1,45 @@
+# Installation media and downloaded packages
+downloads/
+*.iso
+*.ova
+*.7z
+
+# VirtualBox machines, disks, snapshots and runtime state
+VirtualBox VMs/
+*.vdi
+*.vmdk
+*.vhd
+*.sav
+*.nvram
+*.vbox
+*.vbox-prev
+*.vbox-tmp
+*.log
+
+# Generated, local and temporary files
+staging/
+cloud-init/
+evidence/
+guest-config/target/bootstrap-target.sh
+guest-config/wazuh/ifcfg-eth0
+guest-config/wazuh/soc-lab.nmconnection
+scripts/new-seed-iso.ps1
+
+# Curated screenshots live under docs/images and may be committed
+!docs/images/**/*.png
+
+# Credentials and private material
+*.pem
+*.key
+*.pfx
+*.p12
+*password*
+*credential*
+*secret*
+
+# Operating-system and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
